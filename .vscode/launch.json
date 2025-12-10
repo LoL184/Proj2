@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run app (module)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "myproject.app",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/src"
+        }
+    ]
+}
