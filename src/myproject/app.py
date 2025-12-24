@@ -1,4 +1,4 @@
-from myproject.utils import greet, fetch_status
+from utils import greet, fetch_status
 
 
 def main():
