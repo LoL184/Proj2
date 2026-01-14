@@ -1,0 +1,9 @@
+import requests
+from fastapi import FastAPI
+
+
+app = FastAPI(title="Server")
+
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
