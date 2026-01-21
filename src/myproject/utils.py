@@ -1,4 +1,6 @@
-import requests
+import json
+
+'''import requests
 from fastapi import FastAPI
 
 
@@ -40,3 +42,12 @@ def get_random_dog_url():
     r = requests.get(url="https://dog.ceo/api/breeds/image/random", timeout=5)
     r.raise_for_status
     return r.json()["message"]
+'''
+
+# Функции, для преобразования данных из JSON в dict и обратно
+def dict_list_to_json(dict_list, filename):
+    pass
+
+def json_to_dict_list(filename):
+    with open(filename, 'r', encoding='utf-8') as f:
+        return json.load(f)
