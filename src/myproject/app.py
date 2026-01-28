@@ -21,10 +21,14 @@ def get_all_students():
     except FileNotFoundError:
         raise HTTPException(500, "students.json not found")
     
+@app.get("/students/{param}")
+def get_all_students_grade(param: str):
+    if "grade:" in param:
+        grade = int(param[param.index('grade:')+6:param.index('grade:')+7:])
+        students = json_to_dict_list(DATA)
+        return [s for s in students if s.get("grade") == grade]
+
 @app.get("/students/{grade}")
-def get_all_students_grade(grade: int):
-    students = json_to_dict_list(DATA)
-    return [s for s in students if s.get("grade") == grade]
 
 def main():
     pass
