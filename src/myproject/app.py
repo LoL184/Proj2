@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from myproject.utils import json_to_dict_list
 import os
 from pathlib import Path
-from schemas import Student
+from schemas import Student, Error
 
 
 DATA = Path(__file__).resolve().parents[1] / "data" / "students.json"
