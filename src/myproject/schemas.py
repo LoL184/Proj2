@@ -15,3 +15,15 @@ class Student(BaseModel):
 
 class Error(BaseModel):
     pass
+
+class StudentUpdate(BaseModel): 
+    """Тело для PATCH: все поля опциональны; валидируются, если переданы.""" 
+    first_name: str | None = None 
+    last_name: str | None = None 
+    date_of_birth: str | None = None 
+    email: str | None = None 
+    phone_number: str | None = None 
+    address: str | None = None 
+    enrollment_year: int | None = None 
+    grade: int | None = Field(None, ge=1, le=11, description="Новый класс (1–11)") 
+    
