@@ -53,3 +53,78 @@ def get_students_by_grade(
         stmt = stmt.order_by(students.c.student_id)
         rows = conn.execute(stmt).fetchall()
     return [dict(r._mapping) for r in rows]
+
+@app.post("/students",
+summary="Создать ученика (POST)",
+description="Принимает полную модель Student. Если id уже существует — 409 Conflict.",
+status_code=201,
+response_model=Student,
+responses={
+    201: {"description": "Создано"},
+    409: {"model": Error, "description": "Ученик с таким ID уже есть"},},
+)
+def create_student(payload: Student): # payload — это Pydantic-модель Student(валидируется Pydantic)
+    with engine.begin() as conn:
+        exists = conn.execute(
+            db.select(students.c.student_id).where(students.c.student_id == payload.student_id)
+        ).fetchall()
+        if exists is None:
+            raise HTTPException(status_code=409, detail="student_id already exists")
+        
+        conn.execute(db.insert(students), [payload.model_dump()])
+
+    return payload
+
+@app.put(
+        "/students/{student_id}"
+)
+def replace_student(student_id:int, payload: Student):
+    if payload.student_id != student_id:
+        raise HTTPException(status_code=400, detail="student_id in path and body must match")
+    
+    with engine.begin() as conn:
+        result = conn.execute(
+            db.update(students)
+            .where(students.c.student_id == student_id)
+            .values(**payload.model_dump(exclude={"student_id"}))
+        )
+        if result.rowcount == 0:
+            raise HTTPException(status_code=404, detail="student not found")
+        
+    return payload 
+
+'''@app.patch( 
+    "/students/{id}", 
+    tags=["notes"], 
+    summary="Частичное обновление (PATCH)", 
+    description="Обновляет только переданные поля. Остальные остаются как были.", 
+    response_model=Student, 
+    responses={ 
+        404: {"model": Error, "description": "Заметка не найдена"}, 
+        500: {"model": Error, "description": "Файл notes.json не найден"}, 
+    },)
+def patch_student(student_id: int, patch: Note):
+    try:
+        notes.append(patch.model_dump())
+    except:
+        raise HTTPException(status_code=500, detail="notes.json not found")  
+
+    raise HTTPException(status_code=404, detail="note not found")
+
+
+@app.delete( 
+    "/notes/{id}", 
+    tags=["notes"], 
+    summary="Удалить заметку (DELETE)", 
+    description="Удаляет запись по ID. Возвращает 204 No Content при успехе.", 
+    status_code=204, 
+    responses={ 
+        204: {"description": "Удалено"}, 
+        404: {"model": Error, "description": "Заметка не найдена"}, 
+        500: {"model": Error, "description": "Файл notes.json не найден"},},) 
+def delete_student(id: int): 
+    try:
+        notes.pop(id)
+    except:
+        raise HTTPException(status_code=500, detail="notes.json not found")  
+    raise HTTPException(status_code=404, detail='note not found')'''
