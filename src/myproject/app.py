@@ -24,3 +24,32 @@ def startup():
 def home_page():
     return {"message": "Привет, Мир!"}
 
+@app.get(
+    "/students"
+)
+def get_all_students(
+    grade: int | None = Query(None, ge=1, le=11),
+    ):
+    with engine.begin() as conn:
+        stmt = db.select(students).order_by(students.c.student_id)
+        if grade is not None:
+            stmt = stmt.where(students.c.grade == grade)
+        rows = conn.execute(stmt).fetchall()
+    return [dict(r._mapping) for r in rows]
+
+@app.get(
+    "/students/{grade}"
+)
+def get_students_by_grade(
+    grade: int = PathParam(..., ge=1, le=11),
+    last_name: str | None = Query(None),
+):
+    with engine.begin() as conn:
+        stmt = db.select(students).where(students.c.grade == grade)
+        if last_name:
+            ln = last_name.strip()
+            stmt = stmt.where(db.func.lower(students.c.last_name) == db.func.lower(ln))
+        
+        stmt = stmt.order_by(students.c.student_id)
+        rows = conn.execute(stmt).fetchall()
+    return [dict(r._mapping) for r in rows]
