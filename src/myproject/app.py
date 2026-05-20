@@ -1,8 +1,13 @@
 from fastapi import FastAPI, HTTPException, Query, Path as PathParam, Response
 import sqlalchemy as db
+from contextlib import asynccontextmanager
 
-from myproject.schemas import Student, Error, StudentUpdate
-from myproject.badbd import engine, students, init_db
+from schemas import Student, Error, StudentUpdate
+from badbd import engine, students, init_db
+
+
+async def lifespan(app: FastAPI):
+    init_db()
 
 app = FastAPI(
     title="School API (SQLite)",
@@ -10,15 +15,15 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url=None,
+    lifespan=lifespan # pyright: ignore[reportArgumentType]
 )
 
 app.openapi_tags = [
     {"name": "health", "description": "Проверка, что сервер жив"},
     {"name": "students", "desctiption": "Эндпоинты по ученикам"}
 ]
-@app.on_event("startup")
-def startup():
-    init_db()
+
+
 
 @app.get("/", tags=["health"])
 def home_page():
