@@ -9,19 +9,25 @@ from badbd import engine, students, init_db
 async def lifespan(app: FastAPI):
     init_db()
 
-app = FastAPI(
-    title="School API (SQLite)",
-    description="Мини-API для списка учеников на SQLite.",
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url=None,
-    lifespan=lifespan # pyright: ignore[reportArgumentType]
-)
+def create_app() -> FastAPI:
 
-app.openapi_tags = [
-    {"name": "health", "description": "Проверка, что сервер жив"},
-    {"name": "students", "desctiption": "Эндпоинты по ученикам"}
-]
+    app = FastAPI(
+        title="School API (SQLite)",
+        description="Мини-API для списка учеников на SQLite.",
+        version="1.0.0",
+        docs_url="/docs",
+        redoc_url=None,
+        lifespan=lifespan # pyright: ignore[reportArgumentType]
+    )
+
+    app.openapi_tags = [
+        {"name": "health", "description": "Проверка, что сервер жив"},
+        {"name": "students", "desctiption": "Эндпоинты по ученикам"}
+    ]
+    
+    return app
+
+app = create_app()
 
 
 
@@ -98,38 +104,3 @@ def replace_student(student_id:int, payload: Student):
         
     return payload 
 
-'''@app.patch( 
-    "/students/{id}", 
-    tags=["notes"], 
-    summary="Частичное обновление (PATCH)", 
-    description="Обновляет только переданные поля. Остальные остаются как были.", 
-    response_model=Student, 
-    responses={ 
-        404: {"model": Error, "description": "Заметка не найдена"}, 
-        500: {"model": Error, "description": "Файл notes.json не найден"}, 
-    },)
-def patch_student(student_id: int, patch: Note):
-    try:
-        notes.append(patch.model_dump())
-    except:
-        raise HTTPException(status_code=500, detail="notes.json not found")  
-
-    raise HTTPException(status_code=404, detail="note not found")
-
-
-@app.delete( 
-    "/notes/{id}", 
-    tags=["notes"], 
-    summary="Удалить заметку (DELETE)", 
-    description="Удаляет запись по ID. Возвращает 204 No Content при успехе.", 
-    status_code=204, 
-    responses={ 
-        204: {"description": "Удалено"}, 
-        404: {"model": Error, "description": "Заметка не найдена"}, 
-        500: {"model": Error, "description": "Файл notes.json не найден"},},) 
-def delete_student(id: int): 
-    try:
-        notes.pop(id)
-    except:
-        raise HTTPException(status_code=500, detail="notes.json not found")  
-    raise HTTPException(status_code=404, detail='note not found')'''
